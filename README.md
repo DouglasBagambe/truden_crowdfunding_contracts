@@ -1,57 +1,111 @@
-# Sample Hardhat 3 Beta Project (`node:test` and `viem`)
+# Crowdfunding Contracts – RWA Tokenization Platform
 
-This project showcases a Hardhat 3 Beta project using the native Node.js test runner (`node:test`) and the `viem` library for Ethereum interactions.
+This repository contains the **smart contracts and development environment** for the Crowdfunding dApp—a blockchain platform empowering underrepresented entrepreneurs to raise funds globally via **escrow-managed contributions, NFT-backed investments, and DAO governance**.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+Contracts are written in **Solidity**, built with **Hardhat 3 Beta**, and tested using the **Node.js test runner (`node:test`)** and **`viem`** for Ethereum interactions.
 
-## Project Overview
+---
 
-This example project includes:
+## 📌 Features
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using [`node:test`](nodejs.org/api/test.html), the new Node.js native test runner, and [`viem`](https://viem.sh/).
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+- **Escrow Contract** – Locks investor funds, releases only on verified milestones or DAO consensus.
+- **Project Factory & Project Contracts** – Create and manage individual fundraising campaigns.
+- **NFT Registry** – Issues **ERC-721 tokens** for each investment (tradable, transferable, dynamically valued).
+- **DAO Governance** – Token-weighted or quadratic voting for treasury proposals, milestone releases, and disputes.
+- **Treasury** – Holds platform fees and DAO-controlled funds for community projects.
+- **Dispute Manager** – Handles conflicts with arbitration (off-chain evidence + on-chain enforcement).
 
-## Usage
+---
 
-### Running Tests
+## 🛠️ Tech Stack
 
-To run all the tests in the project, execute the following command:
+- **Language:** Solidity ^0.8.x
+- **Framework:** Hardhat 3 Beta
+- **Testing:** Node.js `node:test` runner + Viem
+- **Deployment:** Hardhat Ignition modules
+- **Libraries:** OpenZeppelin (ERC-721, AccessControl, Timelock, SafeERC20), Hardhat Plugins
+- **Storage:** IPFS for metadata, PostgreSQL/MongoDB for off-chain indexing
 
-```shell
-npx hardhat test
+---
+
+## 📂 Project Structure
+
+```text
+contracts/
+    core/           # Main contracts (Escrow, Project, NFTRegistry, Governance, Treasury, DisputeManager)
+    interfaces/     # Interfaces (IProject, IEscrow, INFTRegistry, IGovernance, ITreasury)
+    libs/           # Shared libraries (math helpers, oracle adapters)
+    utils/          # Access control, pausable modules
+scripts/
+deploy/           # Deployment scripts (Hardhat Ignition)
+tests/
+    unit/           # Unit tests for each contract
+    integration/    # Full flow tests (invest → NFT → escrow → milestone → release)
+docs/
+ABIs/             # ABI outputs
+specs/            # Contract design docs
+hardhat.config.ts
+package.json
+README.md
 ```
 
-You can also selectively run the Solidity or `node:test` tests:
+---
 
-```shell
-npx hardhat test solidity
-npx hardhat test nodejs
-```
+## 🚀 Setup
 
-### Make a deployment to Sepolia
+1. **Install dependencies**
 
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+   ```bash
+   npm install
+   ```
 
-To run the deployment to a local chain:
+2. **Compile contracts**
 
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
-```
+   ```bash
+   npx hardhat compile
+   ```
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+3. **Run tests**
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+   - All tests: `npx hardhat test`
+   - Solidity unit tests: `npx hardhat test solidity`
+   - Node.js + Viem integration tests: `npx hardhat test nodejs`
 
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+4. **Deploy contracts**
+   - Local: `npx hardhat ignition deploy ignition/modules/Crowdfunding.ts`
+   - Sepolia testnet:
+     - Fund your account with Sepolia ETH
+     - Set your private key: `npx hardhat keystore set SEPOLIA_PRIVATE_KEY`
+     - Deploy: `npx hardhat ignition deploy --network sepolia ignition/modules/Crowdfunding.ts`
 
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
+---
 
-After setting the variable, you can run the deployment with the Sepolia network:
+## 🧪 Testing Philosophy
 
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+- **Unit tests:** Validate each contract in isolation (Escrow, NFT, Governance).
+- **Integration tests:** Full workflow (create project → invest → NFT minted → escrow locked → milestone release).
+- **Edge cases:** Reentrancy, double spend, dispute resolution, oracle update failures.
+
+---
+
+## 🔒 Security & Best Practices
+
+- OpenZeppelin standards
+- Reentrancy guards on fund release/refund
+- Role-based access control (ADMIN, ORACLE, ARBITRATOR)
+- Multi-sig & timelock enforced treasury payouts
+- Static analysis with Slither/MythX before deploy
+- External audit before mainnet
+
+---
+
+## 📊 Roadmap
+
+- ✅ ProjectFactory, Escrow, NFTRegistry base implementation
+- 🔄 Governance & Treasury integration
+- 🔄 Oracle adapter for dynamic NFT valuations
+- 🔄 Integration with KYC/AML provider
+- 🔄 Security audit & bug bounty program
+- 🚀 Mainnet + L2 deployment
+
+---
