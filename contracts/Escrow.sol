@@ -7,11 +7,11 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
- * @title Enhanced Escrow Contract for Crowdfunding Platform
+ * @title Escrow Contract for Crowdfunding Platform
  * @dev Manages project funding with milestone-based releases and dispute resolution
  * Integrates with Kleros for decentralized arbitration
  */
-contract EnhancedEscrow is ReentrancyGuard, AccessControl, Pausable {
+contract Escrow is ReentrancyGuard, AccessControl, Pausable {
     using SafeERC20 for IERC20;
 
     // Role definitions
