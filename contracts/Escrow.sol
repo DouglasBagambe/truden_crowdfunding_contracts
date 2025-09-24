@@ -262,7 +262,7 @@ contract Escrow is ReentrancyGuard, AccessControl, Pausable {
     /**
      * @dev Enhanced dispute system
      */
-    function raiseDispute(uint256 _projectId, uint256 _milestoneId, string memory _reason) external whenNotPaused {
+    function raiseDispute(uint256 _projectId, uint256 _milestoneId, string memory /* _reason */) external whenNotPaused {
         require(investments[_projectId][msg.sender].amount > 0 || 
                 hasRole(VALIDATOR_ROLE, msg.sender), "Not authorized");
         
