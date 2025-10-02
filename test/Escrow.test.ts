@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 import { network } from "hardhat";
 import { parseEther, getAddress } from "viem";
 
-describe("EnhancedEscrow", async function () {
+describe("Escrow", async function () {
   const { viem } = await network.connect();
   const publicClient = await viem.getPublicClient();
 
@@ -26,8 +26,8 @@ describe("EnhancedEscrow", async function () {
     parseEther("1000000"),
   ]);
 
-  // Deploy the Enhanced Escrow contract
-  const enhancedEscrow = await viem.deployContract("EnhancedEscrow", [
+  // Deploy the Escrow contract
+  const enhancedEscrow = await viem.deployContract("Escrow", [
     feeRecipient.account.address,
   ]);
 
