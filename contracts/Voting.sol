@@ -62,6 +62,20 @@ contract Voting is AccessControl, Pausable, ReentrancyGuard {
         uint256 nftBalance;
     }
 
+    struct TreasuryBalance {
+        uint256 totalBalance;
+        uint256 lockedAmount;
+    }
+
+    // Mappings
+    mapping(uint256 => Proposal) public proposals;
+    mapping(uint256 => mapping(address => Stake)) public stakes;
+    mapping(uint256 => address[]) public proposalStakers;
+    mapping(address => VoterInfo) public voters;
+    mapping(address => TreasuryBalance) public treasury;
+    mapping(address => uint256[]) public userProposals;
+    mapping(uint256 => bool) public proposalExists;
+
     uint256 public proposalCounter;
     uint256 public constant MIN_STAKE_AMOUNT = 1e18; // 1 token minimum
     uint256 public constant MIN_VOTING_PERIOD = 3 days;
@@ -213,7 +227,7 @@ contract Voting is AccessControl, Pausable, ReentrancyGuard {
      */
     function getStake(uint256 _proposalId, address _staker) external view returns (
         uint256 amount,
-        VoteChoice vote,
+        VoteChoice voteChoice,
         uint256 weight,
         StakeStatus status,
         bool claimed
