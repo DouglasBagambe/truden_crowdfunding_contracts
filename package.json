@@ -1,7 +1,13 @@
 {
-  "name": "Contract",
+  "name": "contract",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "verify": "npx tsx scripts/verify-manual.ts",
+    "verify:celo": "npx tsx scripts/verify-manual.ts --network celoSepolia",
+    "verify:base": "npx tsx scripts/verify-manual.ts --network baseSepolia",
+    "verify:sepolia": "npx tsx scripts/verify-manual.ts --network sepolia"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
     "@nomicfoundation/hardhat-ethers": "^4.0.2",

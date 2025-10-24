@@ -1,10 +1,10 @@
 import "dotenv/config";
-import "@nomicfoundation/hardhat-ethers";
-import "@nomicfoundation/hardhat-viem";
-import "@nomicfoundation/hardhat-verify";
+import hardhatToolboxViem from "@nomicfoundation/hardhat-toolbox-viem";
+import hardhatVerify from "@nomicfoundation/hardhat-verify";
 import { HardhatUserConfig } from "hardhat/config";
 
-const config: HardhatUserConfig & { etherscan: unknown; typechain: unknown } = {
+const config: HardhatUserConfig = {
+  plugins: [hardhatToolboxViem, hardhatVerify],
   solidity: {
     version: "0.8.28",
     settings: {
@@ -13,6 +13,7 @@ const config: HardhatUserConfig & { etherscan: unknown; typechain: unknown } = {
         runs: 200,
       },
       viaIR: true,
+      evmVersion: "paris",
     },
   },
   networks: {
@@ -76,58 +77,58 @@ const config: HardhatUserConfig & { etherscan: unknown; typechain: unknown } = {
       chainId: 8453,
     },
   },
-  etherscan: {
-    apiKey: {
-      sepolia: process.env.ETHERSCAN_API_KEY || "",
-      celoSepolia: process.env.CELOSCAN_API_KEY || "",
-      celoMainnet: process.env.CELOSCAN_API_KEY || "",
-      baseSepolia: process.env.BASESCAN_API_KEY || "",
-      baseMainnet: process.env.BASESCAN_API_KEY || "",
+  verify: {
+    etherscan: {
+      apiKey: process.env.CELOSCAN_API_KEY || process.env.ETHERSCAN_API_KEY || "",
     },
-    customChains: [
-      {
-        network: "celoSepolia",
-        chainId: 11142220,
-        urls: {
-          apiURL: "https://api-sepolia.celoscan.io/api",
-          browserURL: "https://sepolia.celoscan.io",
+  },
+  chainDescriptors: {
+    11142220: {
+      name: "celoSepolia",
+      blockExplorers: {
+        etherscan: {
+          name: "Celoscan",
+          url: "https://sepolia.celoscan.io",
+          apiUrl: "https://api-sepolia.celoscan.io/api",
         },
       },
-      {
-        network: "celoMainnet",
-        chainId: 42220,
-        urls: {
-          apiURL: "https://api.celoscan.io/api",
-          browserURL: "https://celoscan.io",
+    },
+    42220: {
+      name: "celoMainnet",
+      blockExplorers: {
+        etherscan: {
+          name: "Celoscan",
+          url: "https://celoscan.io",
+          apiUrl: "https://api.celoscan.io/api",
         },
       },
-      {
-        network: "baseSepolia",
-        chainId: 84532,
-        urls: {
-          apiURL: "https://api-sepolia.basescan.org/api",
-          browserURL: "https://sepolia.basescan.org",
+    },
+    84532: {
+      name: "baseSepolia",
+      blockExplorers: {
+        etherscan: {
+          name: "Basescan",
+          url: "https://sepolia.basescan.org",
+          apiUrl: "https://api-sepolia.basescan.org/api",
         },
       },
-      {
-        network: "baseMainnet",
-        chainId: 8453,
-        urls: {
-          apiURL: "https://api.basescan.org/api",
-          browserURL: "https://basescan.org",
+    },
+    8453: {
+      name: "baseMainnet",
+      blockExplorers: {
+        etherscan: {
+          name: "Basescan",
+          url: "https://basescan.org",
+          apiUrl: "https://api.basescan.org/api",
         },
       },
-    ],
+    },
   },
   paths: {
     sources: "./contracts",
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
-  },
-  typechain: {
-    outDir: "typechain",
-    target: "ethers-v6",
   },
 };
 
