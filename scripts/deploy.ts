@@ -27,8 +27,8 @@ async function main() {
       idxLong !== -1
         ? argv[idxLong + 1]
         : idxShort !== -1
-        ? argv[idxShort + 1]
-        : undefined;
+          ? argv[idxShort + 1]
+          : undefined;
     const envNetwork = process.env.HARDHAT_NETWORK as string | undefined;
     const runtimeNetwork = ((hre as any).network?.name as string) || undefined;
     const networkName =
@@ -126,6 +126,11 @@ async function main() {
     console.log(`Balance: ${Ethers.formatEther(balance)} ETH`);
     console.log("========================================\n");
 
+    // Fetch the current nonce once so every deploy uses the right value
+    // (avoids stale-nonce errors if a prior run partially succeeded)
+    let nonce = await provider.getTransactionCount(wallet.address, 'pending');
+    console.log(`Starting nonce: ${nonce}`);
+
     // ========== Deploy MockERC20 ==========
     console.log("📦 Deploying MockERC20...");
     const mockErc20ArtifactPath = path.join(
@@ -143,7 +148,8 @@ async function main() {
     const mockERC20 = await MockErc20Factory.deploy(
       "Test Token",
       "TST",
-      Ethers.parseEther("1000000")
+      Ethers.parseEther("1000000"),
+      { nonce: nonce++ }
     );
     await mockERC20.waitForDeployment();
     deploymentAddresses.mockERC20 = await mockERC20.getAddress();
@@ -163,7 +169,7 @@ async function main() {
       counterArtifact.bytecode,
       wallet
     );
-    const counter = await CounterFactory.deploy();
+    const counter = await CounterFactory.deploy({ nonce: nonce++ });
     await counter.waitForDeployment();
     deploymentAddresses.counter = await counter.getAddress();
     console.log("✅ Counter deployed to:", deploymentAddresses.counter);
@@ -183,7 +189,7 @@ async function main() {
       escrowArtifact.bytecode,
       wallet
     );
-    const escrow = await EscrowFactory.deploy(feeRecipient);
+    const escrow = await EscrowFactory.deploy(feeRecipient, { nonce: nonce++ });
     await escrow.waitForDeployment();
     deploymentAddresses.escrow = await escrow.getAddress();
     console.log("✅ Escrow deployed to:", deploymentAddresses.escrow);
@@ -207,7 +213,8 @@ async function main() {
     const investmentNFT = await InvestmentNftFactory.deploy(
       baseURI,
       feeRecipient,
-      escrowAddress
+      escrowAddress,
+      { nonce: nonce++ }
     );
     await investmentNFT.waitForDeployment();
     deploymentAddresses.investmentNFT = await investmentNFT.getAddress();
@@ -237,7 +244,8 @@ async function main() {
     const voting = await VotingFactory.deploy(
       governanceToken,
       escrowAddress,
-      nftContract
+      nftContract,
+      { nonce: nonce++ }
     );
     await voting.waitForDeployment();
     deploymentAddresses.voting = await voting.getAddress();
@@ -257,7 +265,7 @@ async function main() {
       dealRoomArtifact.bytecode,
       wallet
     );
-    const dealRoom = await DealRoomFactory.deploy();
+    const dealRoom = await DealRoomFactory.deploy({ nonce: nonce++ });
     await dealRoom.waitForDeployment();
     deploymentAddresses.dealRoom = await dealRoom.getAddress();
     console.log("✅ DealRoom deployed to:", deploymentAddresses.dealRoom);

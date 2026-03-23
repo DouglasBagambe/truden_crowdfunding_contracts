@@ -27,15 +27,19 @@ const config: HardhatUserConfig = {
       url: "http://127.0.0.1:8545",
     },
 
-    // Ethereum Testnet
-    sepolia: {
-      type: "http",
-      url: process.env.SEPOLIA_RPC_URL || "",
-      accounts: process.env.DEPLOYER_PRIVATE_KEY
-        ? [process.env.DEPLOYER_PRIVATE_KEY]
-        : [],
-      chainId: 11155111,
-    },
+    // Ethereum Testnet (only enabled when SEPOLIA_RPC_URL is set)
+    ...(process.env.SEPOLIA_RPC_URL
+      ? {
+        sepolia: {
+          type: "http" as const,
+          url: process.env.SEPOLIA_RPC_URL,
+          accounts: process.env.DEPLOYER_PRIVATE_KEY
+            ? [process.env.DEPLOYER_PRIVATE_KEY]
+            : [],
+          chainId: 11155111,
+        },
+      }
+      : {}),
 
     // Celo Networks
     celoSepolia: {
@@ -47,7 +51,6 @@ const config: HardhatUserConfig = {
         ? [process.env.DEPLOYER_PRIVATE_KEY]
         : [],
       chainId: 11142220,
-      gasPrice: "auto",
     },
     celoMainnet: {
       type: "http",
@@ -56,7 +59,6 @@ const config: HardhatUserConfig = {
         ? [process.env.DEPLOYER_PRIVATE_KEY]
         : [],
       chainId: 42220,
-      gasPrice: "auto",
     },
 
     // Base Networks
