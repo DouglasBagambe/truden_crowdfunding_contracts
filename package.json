@@ -2,15 +2,23 @@
   "name": "contract",
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.10.0"
+  },
   "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:node": "hardhat test nodejs",
+    "lint": "bash scripts/typecheck-baseline.sh",
+    "lint:full": "tsc --noEmit",
+    "coverage": "hardhat --coverage test nodejs",
+    "verify:ci": "npm run lint && npm run compile && npm test && npm run coverage",
     "verify": "npx tsx scripts/verify-manual.ts",
     "verify:celo": "npx tsx scripts/verify-manual.ts --network celoSepolia",
     "verify:base": "npx tsx scripts/verify-manual.ts --network baseSepolia",
     "verify:sepolia": "npx tsx scripts/verify-manual.ts --network sepolia"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
-    "@nomicfoundation/hardhat-ethers": "^4.0.2",
     "@nomicfoundation/hardhat-ignition": "^3.0.3",
     "@nomicfoundation/hardhat-ignition-viem": "^3.0.3",
     "@nomicfoundation/hardhat-keystore": "^3.0.1",

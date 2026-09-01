@@ -1,0 +1,19 @@
+image: node:22-bookworm-slim
+
+definitions:
+  steps:
+    - step: &verify_contracts
+        name: Verify contracts (no deployment)
+        caches:
+          - node
+        script:
+          - npm ci --ignore-scripts --no-audit --no-fund
+          - npm run verify:ci
+
+pipelines:
+  branches:
+    "keibo/**":
+      - step: *verify_contracts
+  pull-requests:
+    "**":
+      - step: *verify_contracts

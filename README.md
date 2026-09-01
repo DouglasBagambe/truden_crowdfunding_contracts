@@ -56,22 +56,28 @@ README.md
 1. **Install dependencies**
 
    ```bash
-   npm install
+   npm ci
    ```
 
 2. **Compile contracts**
 
    ```bash
-   npx hardhat compile
+   npm run compile
    ```
 
 3. **Run tests**
 
-   - All tests: `npx hardhat test`
-   - Solidity unit tests: `npx hardhat test solidity`
-   - Node.js + Viem integration tests: `npx hardhat test nodejs`
+   - All tests: `npm test`
+   - Node.js + Viem integration tests: `npm run test:node`
+   - Coverage: `npm run coverage`
 
-4. **Deploy contracts**
+4. **Run the non-deploying CI verification**
+
+   ```bash
+   npm run verify:ci
+   ```
+
+5. **Deploy contracts**
    - Local: `npx hardhat ignition deploy ignition/modules/Crowdfunding.ts`
    - Sepolia testnet:
      - Fund your account with Sepolia ETH

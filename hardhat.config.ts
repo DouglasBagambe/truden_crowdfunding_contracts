@@ -1,10 +1,9 @@
 import "dotenv/config";
 import hardhatToolboxViem from "@nomicfoundation/hardhat-toolbox-viem";
-import hardhatVerify from "@nomicfoundation/hardhat-verify";
 import { HardhatUserConfig } from "hardhat/config";
 
 const config: HardhatUserConfig = {
-  plugins: [hardhatToolboxViem, hardhatVerify],
+  plugins: [hardhatToolboxViem],
   solidity: {
     version: "0.8.28",
     settings: {
