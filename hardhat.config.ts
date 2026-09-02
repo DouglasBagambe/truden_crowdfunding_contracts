@@ -40,43 +40,57 @@ const config: HardhatUserConfig = {
       }
       : {}),
 
-    // Celo Networks
-    celoSepolia: {
-      type: "http",
-      url:
-        process.env.CELO_SEPOLIA_RPC ||
-        "https://forno.celo-sepolia.celo-testnet.org",
-      accounts: process.env.DEPLOYER_PRIVATE_KEY
-        ? [process.env.DEPLOYER_PRIVATE_KEY]
-        : [],
-      chainId: 11142220,
-    },
-    celoMainnet: {
-      type: "http",
-      url: process.env.CELO_MAINNET_RPC || "https://forno.celo.org",
-      accounts: process.env.DEPLOYER_PRIVATE_KEY
-        ? [process.env.DEPLOYER_PRIVATE_KEY]
-        : [],
-      chainId: 42220,
-    },
+    // Celo Networks (only enabled when the matching RPC URL is explicitly set)
+    ...(process.env.CELO_SEPOLIA_RPC
+      ? {
+        celoSepolia: {
+          type: "http" as const,
+          url: process.env.CELO_SEPOLIA_RPC,
+          accounts: process.env.DEPLOYER_PRIVATE_KEY
+            ? [process.env.DEPLOYER_PRIVATE_KEY]
+            : [],
+          chainId: 11142220,
+        },
+      }
+      : {}),
+    ...(process.env.CELO_MAINNET_RPC
+      ? {
+        celoMainnet: {
+          type: "http" as const,
+          url: process.env.CELO_MAINNET_RPC,
+          accounts: process.env.DEPLOYER_PRIVATE_KEY
+            ? [process.env.DEPLOYER_PRIVATE_KEY]
+            : [],
+          chainId: 42220,
+        },
+      }
+      : {}),
 
-    // Base Networks
-    baseSepolia: {
-      type: "http",
-      url: process.env.BASE_SEPOLIA_RPC || "https://sepolia.base.org",
-      accounts: process.env.DEPLOYER_PRIVATE_KEY
-        ? [process.env.DEPLOYER_PRIVATE_KEY]
-        : [],
-      chainId: 84532,
-    },
-    baseMainnet: {
-      type: "http",
-      url: process.env.BASE_MAINNET_RPC || "https://mainnet.base.org",
-      accounts: process.env.DEPLOYER_PRIVATE_KEY
-        ? [process.env.DEPLOYER_PRIVATE_KEY]
-        : [],
-      chainId: 8453,
-    },
+    // Base Networks (only enabled when the matching RPC URL is explicitly set)
+    ...(process.env.BASE_SEPOLIA_RPC
+      ? {
+        baseSepolia: {
+          type: "http" as const,
+          url: process.env.BASE_SEPOLIA_RPC,
+          accounts: process.env.DEPLOYER_PRIVATE_KEY
+            ? [process.env.DEPLOYER_PRIVATE_KEY]
+            : [],
+          chainId: 84532,
+        },
+      }
+      : {}),
+    ...(process.env.BASE_MAINNET_RPC
+      ? {
+        baseMainnet: {
+          type: "http" as const,
+          url: process.env.BASE_MAINNET_RPC,
+          accounts: process.env.DEPLOYER_PRIVATE_KEY
+            ? [process.env.DEPLOYER_PRIVATE_KEY]
+            : [],
+          chainId: 8453,
+        },
+      }
+      : {}),
   },
   verify: {
     etherscan: {

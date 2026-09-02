@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "engines": {
-    "node": ">=22.10.0"
+    "node": ">=22.10.0 <23"
   },
   "scripts": {
     "compile": "hardhat compile",
@@ -12,7 +12,8 @@
     "lint": "bash scripts/typecheck-baseline.sh",
     "lint:full": "tsc --noEmit",
     "coverage": "hardhat --coverage test nodejs",
-    "verify:ci": "npm run lint && npm run compile && npm test && npm run coverage",
+    "size": "node scripts/check-bytecode-size.mjs",
+    "verify:ci": "npm run lint && npm run compile && npm test && npm run coverage && npm run size",
     "verify": "npx tsx scripts/verify-manual.ts",
     "verify:celo": "npx tsx scripts/verify-manual.ts --network celoSepolia",
     "verify:base": "npx tsx scripts/verify-manual.ts --network baseSepolia",

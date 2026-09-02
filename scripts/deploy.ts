@@ -37,21 +37,18 @@ async function main() {
       ((hre as any).config?.networks as Record<string, any>) || {};
     const selectedCfg = networksCfg[networkName] || {};
     const selectedUrl = (selectedCfg as any)?.url;
-    const fallbackUrl = (() => {
+    const configuredUrl = (() => {
       switch (networkName) {
         case "celoSepolia":
-          return (
-            process.env.CELO_SEPOLIA_RPC ||
-            "https://forno.celo-sepolia.celo-testnet.org"
-          );
+          return process.env.CELO_SEPOLIA_RPC || "";
         case "celoMainnet":
-          return process.env.CELO_MAINNET_RPC || "https://forno.celo.org";
+          return process.env.CELO_MAINNET_RPC || "";
         case "sepolia":
           return process.env.SEPOLIA_RPC_URL || "";
         case "baseSepolia":
-          return process.env.BASE_SEPOLIA_RPC || "https://sepolia.base.org";
+          return process.env.BASE_SEPOLIA_RPC || "";
         case "baseMainnet":
-          return process.env.BASE_MAINNET_RPC || "https://mainnet.base.org";
+          return process.env.BASE_MAINNET_RPC || "";
         case "localhost":
         case "hardhat":
           return "http://127.0.0.1:8545";
@@ -69,7 +66,7 @@ async function main() {
       connection = "";
     }
     if (!connection) {
-      connection = String(fallbackUrl || "");
+      connection = String(configuredUrl || "");
     }
     const chainId =
       (selectedCfg.chainId as number) ||

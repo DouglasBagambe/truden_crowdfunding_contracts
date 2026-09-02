@@ -27,15 +27,15 @@ describe("DealRoom", async function () {
 
     const tx = await dealRoom.write.createDealRoom(
       [projectId, title, description, expiryDate, kycRequired, minIntent],
-      { account: innovator.account }
+      { account: innovator.account },
     );
 
-    await viem.assertions.emitWithArgs(tx, dealRoom, "DealRoomCreated", [
-      nextId,
-      projectId,
-      getAddress(innovator.account.address),
-      title,
-    ]);
+    await viem.assertions.emitWithArgs(
+      Promise.resolve(tx),
+      dealRoom,
+      "DealRoomCreated",
+      [nextId, projectId, getAddress(innovator.account.address), title],
+    );
 
     const info = await dealRoom.read.getDealRoom([nextId]);
     // tuple: projectId, innovator, title, description, creationDate, expiryDate, status, kycRequired, minInvestmentIntent
@@ -54,17 +54,18 @@ describe("DealRoom", async function () {
     const expiry = BigInt(Math.floor(Date.now() / 1000)) + 7n * 24n * 60n * 60n;
     await dealRoom.write.createDealRoom(
       [1n, "Room A", "Desc", expiry, false, 100n],
-      { account: innovator.account }
+      { account: innovator.account },
     );
 
     const req = await dealRoom.write.requestAccess([id, 200n, "Interested"], {
       account: investorA.account,
     });
-    await viem.assertions.emitWithArgs(req, dealRoom, "AccessRequested", [
-      id,
-      getAddress(investorA.account.address),
-      200n,
-    ]);
+    await viem.assertions.emitWithArgs(
+      Promise.resolve(req),
+      dealRoom,
+      "AccessRequested",
+      [id, getAddress(investorA.account.address), 200n],
+    );
 
     // hasAccess should be false until granted
     const hasAccess = await dealRoom.read.hasAccess([
@@ -80,7 +81,7 @@ describe("DealRoom", async function () {
       BigInt(Math.floor(Date.now() / 1000)) + 30n * 24n * 60n * 60n;
     await dealRoom.write.createDealRoom(
       [2n, "KYC Room", "Desc", expiry, true, 1_000n],
-      { account: innovator.account }
+      { account: innovator.account },
     );
 
     // Too low intent
@@ -89,7 +90,7 @@ describe("DealRoom", async function () {
         dealRoom.write.requestAccess([id, 999n, "too low"], {
           account: investorA.account,
         }),
-      /Investment intent too low/
+      /Investment intent too low/,
     );
 
     // Missing KYC
@@ -98,7 +99,7 @@ describe("DealRoom", async function () {
         dealRoom.write.requestAccess([id, 1_000n, "ok"], {
           account: investorA.account,
         }),
-      /KYC verification required/
+      /KYC verification required/,
     );
 
     // Admin updates KYC
@@ -108,14 +109,18 @@ describe("DealRoom", async function () {
       [investorA.account.address, 1, future],
       {
         account: admin.account,
-      }
+      },
     );
 
     // Now request succeeds
     const ok = await dealRoom.write.requestAccess([id, 1_000n, "ok"], {
       account: investorA.account,
     });
-    await viem.assertions.emit(ok, dealRoom, "AccessRequested");
+    await viem.assertions.emit(
+      Promise.resolve(ok),
+      dealRoom,
+      "AccessRequested",
+    );
   });
 
   it("innovator grants and revokes access", async function () {
@@ -124,7 +129,7 @@ describe("DealRoom", async function () {
       BigInt(Math.floor(Date.now() / 1000)) + 30n * 24n * 60n * 60n;
     await dealRoom.write.createDealRoom(
       [3n, "Grant Room", "Desc", expiry, false, 10n],
-      { account: innovator.account }
+      { account: innovator.account },
     );
 
     await dealRoom.write.requestAccess([id, 10n, "pls"], {
@@ -135,34 +140,40 @@ describe("DealRoom", async function () {
       [id, investorB.account.address],
       {
         account: innovator.account,
-      }
+      },
     );
-    await viem.assertions.emitWithArgs(grantTx, dealRoom, "AccessGranted", [
-      id,
-      getAddress(investorB.account.address),
-      getAddress(innovator.account.address),
-    ]);
+    await viem.assertions.emitWithArgs(
+      Promise.resolve(grantTx),
+      dealRoom,
+      "AccessGranted",
+      [
+        id,
+        getAddress(investorB.account.address),
+        getAddress(innovator.account.address),
+      ],
+    );
 
     assert.equal(
       await dealRoom.read.hasAccess([id, investorB.account.address]),
-      true
+      true,
     );
 
     const revokeTx = await dealRoom.write.revokeAccess(
       [id, investorB.account.address, "breach"],
       {
         account: innovator.account,
-      }
+      },
     );
-    await viem.assertions.emitWithArgs(revokeTx, dealRoom, "AccessRevoked", [
-      id,
-      getAddress(investorB.account.address),
-      "breach",
-    ]);
+    await viem.assertions.emitWithArgs(
+      Promise.resolve(revokeTx),
+      dealRoom,
+      "AccessRevoked",
+      [id, getAddress(investorB.account.address), "breach"],
+    );
 
     assert.equal(
       await dealRoom.read.hasAccess([id, investorB.account.address]),
-      false
+      false,
     );
   });
 
@@ -172,7 +183,7 @@ describe("DealRoom", async function () {
       BigInt(Math.floor(Date.now() / 1000)) + 30n * 24n * 60n * 60n;
     await dealRoom.write.createDealRoom(
       [4n, "Docs", "Desc", expiry, false, 1n],
-      { account: innovator.account }
+      { account: innovator.account },
     );
 
     // Only innovator can add
@@ -181,17 +192,18 @@ describe("DealRoom", async function () {
         dealRoom.write.addDocument([id, "QmHash1"], {
           account: investorA.account,
         }),
-      /Only innovator can add documents/
+      /Only innovator can add documents/,
     );
 
     const add = await dealRoom.write.addDocument([id, "QmHash1"], {
       account: innovator.account,
     });
-    await viem.assertions.emitWithArgs(add, dealRoom, "DocumentAdded", [
-      id,
-      "QmHash1",
-      getAddress(innovator.account.address),
-    ]);
+    await viem.assertions.emitWithArgs(
+      Promise.resolve(add),
+      dealRoom,
+      "DocumentAdded",
+      [id, "QmHash1", getAddress(innovator.account.address)],
+    );
 
     // Unauthorized cannot read documents
     await assert.rejects(
@@ -199,7 +211,7 @@ describe("DealRoom", async function () {
         dealRoom.read.getDealRoomDocuments([id], {
           account: investorA.account,
         }),
-      /Access denied/
+      /Access denied/,
     );
 
     // Request + grant access
@@ -221,18 +233,19 @@ describe("DealRoom", async function () {
     const viewTx = await dealRoom.write.viewDocument([id, "QmHash1"], {
       account: investorA.account,
     });
-    await viem.assertions.emitWithArgs(viewTx, dealRoom, "DocumentViewed", [
-      id,
-      getAddress(investorA.account.address),
-      "QmHash1",
-    ]);
+    await viem.assertions.emitWithArgs(
+      Promise.resolve(viewTx),
+      dealRoom,
+      "DocumentViewed",
+      [id, getAddress(investorA.account.address), "QmHash1"],
+    );
 
     // Investor can query their own access info
     const access = await dealRoom.read.getInvestorAccess(
       [id, investorA.account.address],
       {
         account: investorA.account,
-      }
+      },
     );
     // tuple: hasAccess, grantedDate, intent, documentsViewed, lastAccessDate
     assert.equal(access[0], true);
@@ -246,31 +259,35 @@ describe("DealRoom", async function () {
       BigInt(Math.floor(Date.now() / 1000)) + 30n * 24n * 60n * 60n;
     await dealRoom.write.createDealRoom(
       [5n, "Lifecycle", "Desc", expiry, false, 1n],
-      { account: innovator.account }
+      { account: innovator.account },
     );
 
     const closeTx = await dealRoom.write.closeDealRoom([id], {
       account: innovator.account,
     });
-    await viem.assertions.emit(closeTx, dealRoom, "DealRoomClosed");
+    await viem.assertions.emit(
+      Promise.resolve(closeTx),
+      dealRoom,
+      "DealRoomClosed",
+    );
 
     // Now add/grant should revert due to not active
     await assert.rejects(
       () =>
         dealRoom.write.addDocument([id, "X"], { account: innovator.account }),
-      /Deal room not active/
+      /Deal room not active/,
     );
     await assert.rejects(
       () =>
         dealRoom.write.grantAccess([id, investorB.account.address], {
           account: innovator.account,
         }),
-      /Deal room not active/
+      /Deal room not active/,
     );
 
     // Admin can pause / unpause
-    await dealRoom.write.pause([], { account: admin.account });
-    await dealRoom.write.unpause([], { account: admin.account });
+    await dealRoom.write.pause({ account: admin.account });
+    await dealRoom.write.unpause({ account: admin.account });
 
     // Admin can set default expiry duration
     await dealRoom.write.setDefaultExpiryDuration([1234n], {

@@ -72,18 +72,18 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
     // Check event emission using viem assertions
-    await viem.assertions.emitWithArgs(hash, enhancedEscrow, "ProjectCreated", [
-      nextId,
-      getAddress(creator.account.address),
-      title,
-      targetAmount,
-    ]);
+    await viem.assertions.emitWithArgs(
+      Promise.resolve(hash),
+      enhancedEscrow,
+      "ProjectCreated",
+      [nextId, getAddress(creator.account.address), title, targetAmount],
+    );
 
     const project = await enhancedEscrow.read.getProject([nextId]);
     assert.equal(getAddress(project[0]), getAddress(creator.account.address));
@@ -108,9 +108,9 @@ describe("Escrow", async function () {
           ],
           {
             account: creator.account,
-          }
+          },
         ),
-      /Title required/
+      /Title required/,
     );
   });
 
@@ -130,9 +130,9 @@ describe("Escrow", async function () {
           ],
           {
             account: creator.account,
-          }
+          },
         ),
-      /Description required/
+      /Description required/,
     );
   });
 
@@ -152,9 +152,9 @@ describe("Escrow", async function () {
           ],
           {
             account: creator.account,
-          }
+          },
         ),
-      /Invalid target amount/
+      /Invalid target amount/,
     );
   });
 
@@ -173,7 +173,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const amount = parseEther("5");
@@ -194,17 +194,17 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
     // Check event emission using viem assertions
     await viem.assertions.emitWithArgs(
-      hash,
+      Promise.resolve(hash),
       enhancedEscrow,
       "MilestoneCreated",
-      [projectId, 0n, amount, dueDate]
+      [projectId, 0n, amount, dueDate],
     );
 
     const milestone = await enhancedEscrow.read.getMilestone([projectId, 0n]);
@@ -228,7 +228,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const dueDate =
@@ -247,9 +247,9 @@ describe("Escrow", async function () {
           ],
           {
             account: creator.account,
-          }
+          },
         ),
-      /Invalid amount/
+      /Invalid amount/,
     );
   });
 
@@ -268,7 +268,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const depositAmount = parseEther("2");
@@ -278,18 +278,23 @@ describe("Escrow", async function () {
       {
         account: investor1.account,
         value: depositAmount,
-      }
+      },
     );
 
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
     // Check event emission using viem assertions
-    await viem.assertions.emitWithArgs(hash, enhancedEscrow, "FundsDeposited", [
-      projectId,
-      getAddress(investor1.account.address),
-      depositAmount,
-      getAddress("0x0000000000000000000000000000000000000000"),
-    ]);
+    await viem.assertions.emitWithArgs(
+      Promise.resolve(hash),
+      enhancedEscrow,
+      "FundsDeposited",
+      [
+        projectId,
+        getAddress(investor1.account.address),
+        depositAmount,
+        getAddress("0x0000000000000000000000000000000000000000"),
+      ],
+    );
 
     const project = await enhancedEscrow.read.getProject([projectId]);
     assert.equal(project[4], depositAmount);
@@ -315,7 +320,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const depositAmount = parseEther("2");
@@ -324,18 +329,23 @@ describe("Escrow", async function () {
       [projectId, depositAmount],
       {
         account: investor1.account,
-      }
+      },
     );
 
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
     // Check event emission using viem assertions
-    await viem.assertions.emitWithArgs(hash, enhancedEscrow, "FundsDeposited", [
-      projectId,
-      getAddress(investor1.account.address),
-      depositAmount,
-      getAddress(mockToken.address),
-    ]);
+    await viem.assertions.emitWithArgs(
+      Promise.resolve(hash),
+      enhancedEscrow,
+      "FundsDeposited",
+      [
+        projectId,
+        getAddress(investor1.account.address),
+        depositAmount,
+        getAddress(mockToken.address),
+      ],
+    );
 
     const project = await enhancedEscrow.read.getProject([projectId]);
     assert.equal(project[4], depositAmount);
@@ -356,7 +366,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const depositAmount = parseEther("10");
@@ -366,14 +376,14 @@ describe("Escrow", async function () {
       {
         account: investor1.account,
         value: depositAmount,
-      }
+      },
     );
 
     await viem.assertions.emitWithArgs(
-      hash,
+      Promise.resolve(hash),
       enhancedEscrow,
       "ProjectStatusChanged",
-      [projectId, 1]
+      [projectId, 1],
     );
 
     const project = await enhancedEscrow.read.getProject([projectId]);
@@ -395,7 +405,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const dueDate =
@@ -411,7 +421,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     // Fund the project
@@ -430,10 +440,14 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
-    await viem.assertions.emit(hash, enhancedEscrow, "MilestoneSubmitted");
+    await viem.assertions.emit(
+      Promise.resolve(hash),
+      enhancedEscrow,
+      "MilestoneSubmitted",
+    );
 
     const milestone = await enhancedEscrow.read.getMilestone([projectId, 0n]);
     assert.equal(milestone[3], evidenceURI);
@@ -455,7 +469,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const dueDate =
@@ -471,7 +485,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     // Fund the project
@@ -489,7 +503,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     // Approve milestone
@@ -500,10 +514,14 @@ describe("Escrow", async function () {
       ],
       {
         account: validator.account,
-      }
+      },
     );
 
-    await viem.assertions.emit(hash, enhancedEscrow, "MilestoneApproved");
+    await viem.assertions.emit(
+      Promise.resolve(hash),
+      enhancedEscrow,
+      "MilestoneApproved",
+    );
 
     const milestone = await enhancedEscrow.read.getMilestone([projectId, 0n]);
     assert.equal(milestone[5], 1n); // approvalsCount
@@ -524,7 +542,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const dueDate =
@@ -540,7 +558,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     // Fund the project
@@ -557,10 +575,14 @@ describe("Escrow", async function () {
       ],
       {
         account: investor1.account,
-      }
+      },
     );
 
-    await viem.assertions.emit(hash, enhancedEscrow, "DisputeRaised");
+    await viem.assertions.emit(
+      Promise.resolve(hash),
+      enhancedEscrow,
+      "DisputeRaised",
+    );
 
     const milestone = await enhancedEscrow.read.getMilestone([projectId, 0n]);
     // Dispute status is not exposed in getMilestone; check status only
@@ -582,7 +604,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     const dueDate =
@@ -598,7 +620,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     // Fund the project
@@ -616,7 +638,7 @@ describe("Escrow", async function () {
       ],
       {
         account: investor1.account,
-      }
+      },
     );
 
     // Resolve dispute in favor of creator
@@ -628,10 +650,14 @@ describe("Escrow", async function () {
       ],
       {
         account: resolver.account,
-      }
+      },
     );
 
-    await viem.assertions.emit(hash, enhancedEscrow, "DisputeResolved");
+    await viem.assertions.emit(
+      Promise.resolve(hash),
+      enhancedEscrow,
+      "DisputeResolved",
+    );
 
     const milestone = await enhancedEscrow.read.getMilestone([projectId, 0n]);
     // After resolving in favor of creator, funds are released
@@ -653,7 +679,7 @@ describe("Escrow", async function () {
       ],
       {
         account: creator.account,
-      }
+      },
     );
 
     // Fund the project
@@ -666,13 +692,13 @@ describe("Escrow", async function () {
       [projectId],
       {
         account: owner.account,
-      }
+      },
     );
 
     await viem.assertions.emit(
-      hash,
+      Promise.resolve(hash),
       enhancedEscrow,
-      "EmergencyWithdrawTriggered"
+      "EmergencyWithdrawTriggered",
     );
 
     const project = await enhancedEscrow.read.getProject([projectId]);
@@ -682,18 +708,18 @@ describe("Escrow", async function () {
   it("Should only allow admin to pause/unpause", async function () {
     await assert.rejects(
       () =>
-        enhancedEscrow.write.pause([], {
+        enhancedEscrow.write.pause({
           account: creator.account,
         }),
-      /AccessControlUnauthorizedAccount/
+      /AccessControlUnauthorizedAccount/,
     );
 
-    await enhancedEscrow.write.pause([], {
+    await enhancedEscrow.write.pause({
       account: owner.account,
     });
     assert.equal(await enhancedEscrow.read.paused(), true);
 
-    await enhancedEscrow.write.unpause([], {
+    await enhancedEscrow.write.unpause({
       account: owner.account,
     });
     assert.equal(await enhancedEscrow.read.paused(), false);
@@ -705,7 +731,7 @@ describe("Escrow", async function () {
         enhancedEscrow.write.setPlatformFee([500n], {
           account: creator.account,
         }),
-      /AccessControlUnauthorizedAccount/
+      /AccessControlUnauthorizedAccount/,
     );
 
     await enhancedEscrow.write.setPlatformFee([500n], {
@@ -720,7 +746,7 @@ describe("Escrow", async function () {
         enhancedEscrow.write.setPlatformFee([1001n], {
           account: owner.account,
         }),
-      /Fee too high/
+      /Fee too high/,
     );
   });
 });
