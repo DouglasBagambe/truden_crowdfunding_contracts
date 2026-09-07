@@ -20,4 +20,17 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npm run verify:ci
+      - name: Compile
+        run: npm run compile
+      - name: Type check
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Contract tests
+        run: npm test
+      - name: Coverage
+        run: npm run coverage
+      - name: Invariant and property tests
+        run: npm run test:property
+      - name: Deployed bytecode size checks
+        run: npm run size

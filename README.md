@@ -77,12 +77,23 @@ README.md
    npm run verify:ci
    ```
 
+   This uses Node 22 and a frozen install, then runs compile, strict TypeScript,
+   tests, coverage, invariant/property scenarios, and deployed-bytecode size
+   checks. It does not require keys, contact a chain, or deploy contracts.
+
 5. **Deploy contracts**
    - Local: `npx hardhat ignition deploy ignition/modules/Crowdfunding.ts`
    - Sepolia testnet:
      - Fund your account with Sepolia ETH
      - Set your private key: `npx hardhat keystore set SEPOLIA_PRIVATE_KEY`
      - Deploy: `npx hardhat ignition deploy --network sepolia ignition/modules/Crowdfunding.ts`
+
+   Deployment is a separate, explicitly approved operation. A production
+   container must be immutable, non-root, health-checked, gracefully stopped,
+   observably logged, and resource-limited. Chain IDs, RPC URLs, verified
+   addresses, multisig or managed-signer policy, and explorer evidence must be
+   supplied by deployment configuration; never bake keys or provider values
+   into the image.
 
 ---
 
