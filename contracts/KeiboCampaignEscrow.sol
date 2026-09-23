@@ -81,7 +81,9 @@ contract KeiboCampaignEscrow is AccessControl, Pausable, ReentrancyGuard {
         Campaign storage campaign = campaigns[campaignId];
         require(campaign.creator != address(0) && campaign.state == CampaignState.Funding, "not funding");
         require(block.timestamp < campaign.deadline && amount > 0 && campaign.raised + amount <= campaign.cap, "invalid contribution");
+        uint256 balanceBefore = campaign.asset.balanceOf(address(this));
         campaign.asset.safeTransferFrom(msg.sender, address(this), amount);
+        require(campaign.asset.balanceOf(address(this)) == balanceBefore + amount, "unsupported asset transfer");
         campaign.raised += amount;
         contributions[campaignId][msg.sender] += amount;
         emit Contributed(campaignId, msg.sender, amount);

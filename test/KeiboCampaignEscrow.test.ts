@@ -230,4 +230,26 @@ describe("KeiboCampaignEscrow", async () => {
     );
     assert.equal((await reentrantEscrow.read.campaigns([0n]))[3], 0n);
   });
+
+  it("rejects fee-on-transfer assets before contribution accounting", async () => {
+    const feeToken = await viem.deployContract("FeeOnTransferERC20");
+    const feeEscrow = await viem.deployContract("KeiboCampaignEscrow", [
+      admin.account.address,
+      admin.account.address,
+      86_400n,
+    ]);
+    await feeToken.write.approve([feeEscrow.address, 100n], {
+      account: admin.account,
+    });
+    await feeEscrow.write.createCampaign(
+      [feeToken.address, 100n, (await latestTime()) + 86_400n, [100n]],
+      { account: creator.account },
+    );
+    await assert.rejects(
+      () => feeEscrow.write.contribute([0n, 100n], { account: admin.account }),
+      /unsupported asset transfer/,
+    );
+    assert.equal((await feeEscrow.read.campaigns([0n]))[3], 0n);
+    assert.equal(await feeToken.read.balanceOf([feeEscrow.address]), 0n);
+  });
 });

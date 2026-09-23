@@ -19,6 +19,20 @@ contract FalseReturnERC20 is ERC20 {
     }
 }
 
+contract FeeOnTransferERC20 is ERC20 {
+    constructor() ERC20("Fee On Transfer", "FEE") {
+        _mint(msg.sender, 1_000_000);
+    }
+
+    function transferFrom(address from, address to, uint256 value) public override returns (bool) {
+        uint256 fee = value / 100;
+        _spendAllowance(from, _msgSender(), value);
+        _transfer(from, to, value - fee);
+        if (fee > 0) _burn(from, fee);
+        return true;
+    }
+}
+
 contract ReentrantERC20 is ERC20 {
     IContributionTarget public target;
     uint256 public campaignId;
