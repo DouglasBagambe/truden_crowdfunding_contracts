@@ -119,6 +119,10 @@ contract KeiboCampaignEscrow is AccessControl, Pausable, ReentrancyGuard {
     function cancelCampaign(uint256 campaignId) external onlyRole(CAMPAIGN_MANAGER_ROLE) whenNotPaused {
         Campaign storage campaign = campaigns[campaignId];
         require(campaign.state == CampaignState.Funding || campaign.state == CampaignState.Funded, "not cancellable");
+        // Contributions are refundable in full only while all raised assets remain
+        // collateralized by this escrow. A released milestone has already paid the
+        // creator and fee recipient, so moving to Refunding would be insolvent.
+        require(releasedGross[campaignId] == 0, "released funds cannot be refunded");
         campaign.state = CampaignState.Refunding;
         emit CampaignCancelled(campaignId);
     }

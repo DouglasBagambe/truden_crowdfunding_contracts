@@ -77,6 +77,29 @@ describe("KeiboCampaignEscrow", async () => {
     );
   });
 
+  it("prevents cancellation and contributor refunds after any milestone release", async () => {
+    const now = await latestTime();
+    await escrow.write.createCampaign(
+      [token.address, parseEther("10"), now + 86_400n, [parseEther("5"), parseEther("5")]],
+      { account: creator.account },
+    );
+    await escrow.write.contribute([2n, parseEther("10")], {
+      account: investor.account,
+    });
+    await escrow.write.approveMilestone(
+      [2n, 0n, `0x${"44".repeat(32)}`],
+      { account: admin.account },
+    );
+    await escrow.write.releaseMilestone([2n, 0n], { account: creator.account });
+
+    await assert.rejects(
+      () => escrow.write.cancelCampaign([2n], { account: admin.account }),
+      /released funds cannot be refunded/,
+    );
+    assert.equal((await escrow.read.campaigns([2n]))[5], 1);
+    assert.equal(await escrow.read.contributions([2n, investor.account.address]), parseEther("10"));
+  });
+
   it("conserves cumulative fee dust across multiple milestones", async () => {
     const dustToken = await viem.deployContract("MockERC20", [
       "Dust",
@@ -117,18 +140,18 @@ describe("KeiboCampaignEscrow", async () => {
       [token.address, parseEther("2"), deadline, [parseEther("2")]],
       { account: creator.account },
     );
-    await escrow.write.contribute([2n, parseEther("1")], {
+    await escrow.write.contribute([3n, parseEther("1")], {
       account: investor.account,
     });
     await networkHelpers.time.increaseTo(deadline);
     await assert.rejects(
       () =>
-        escrow.write.contribute([2n, 1n], {
+        escrow.write.contribute([3n, 1n], {
           account: investor.account,
         }),
       /invalid contribution/,
     );
-    await escrow.write.refund([2n], { account: investor.account });
+    await escrow.write.refund([3n], { account: investor.account });
   });
 
   it("fails closed for paused operations, role compromise, and unsafe role recovery", async () => {
