@@ -1,0 +1,21 @@
+{
+  "escrow": "0xA6ef13Ad706BF24F0B28506FD18a06FEac9abF93",
+  "governance": "0x1c2755Ff11BFBF6d49fAA19d9486887A9185d056",
+  "receipt": "0x887867F0B4BD97B98ea970089116cff99DABb400",
+  "evidence": "0x514250B1bda2f1099CF658E3a027e81E8f53CC9b",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployer": "0x16795588BB337E43D90DF5008Aef0eebF1E17AA5",
+  "admin": "0x16795588BB337E43D90DF5008Aef0eebF1E17AA5",
+  "feeRecipient": "0x16795588BB337E43D90DF5008Aef0eebF1E17AA5",
+  "eligibilitySigner": "0x16795588BB337E43D90DF5008Aef0eebF1E17AA5",
+  "timestamp": 1790248428650,
+  "transactions": {
+    "escrow": "0xb3e3c7fd685bcd00c335486c557788ff87d9d6e23a78782122614e68d8355513",
+    "governance": "0xfc8d0b5308cf643df7440d367b075cf30e0657ac921feb56f6d080be9b5dbc81",
+    "receipt": "0x072ad65a1ebc8112176f0df96ced1ff2f1dd4a1fa42f301035ff7643f26ffd97",
+    "evidence": "0x4c7eba81c9bc7a8a6818c4936690f2f69298f70c144f4d2968ddfc938cc8a40f",
+    "grantGovernanceAdmin": "0x77d3b80e81ae71c5a7a25d49227439dfab015a3c16d1c7d4b66166af589595f2",
+    "grantGovernanceGuardian": "0xb483f8bee486b1890e977e1d4308b262c94203d1b0da035e96c651b85ed5a32f"
+  }
+}
