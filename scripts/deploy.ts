@@ -87,6 +87,16 @@ async function deploy(
   return contract as unknown as Ethers.Contract;
 }
 
+async function assertDeployedCode(
+  provider: Ethers.JsonRpcProvider,
+  address: string,
+  name: string,
+) {
+  if ((await provider.getCode(address)) === "0x") {
+    throw new Error(`${name} deployment has no bytecode at ${address}`);
+  }
+}
+
 async function main() {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -203,6 +213,24 @@ const rpcUrl = rpcUrlByNetwork[networkName];
     nonce++,
   );
 
+  await Promise.all([
+    assertDeployedCode(provider, await escrow.getAddress(), "KeiboCampaignEscrow"),
+    assertDeployedCode(provider, await governance.getAddress(), "KeiboGovernance"),
+    assertDeployedCode(provider, await receipt.getAddress(), "KeiboInvestmentReceipt"),
+    assertDeployedCode(provider, await evidence.getAddress(), "KeiboDealRoomEvidence"),
+  ]);
+
+  if (Ethers.getAddress(await escrow.getFunction("feeRecipient")()) !== Ethers.getAddress(feeRecipient)) {
+    throw new Error("Escrow fee recipient verification failed");
+  }
+  if (Ethers.getAddress(await receipt.getFunction("eligibilitySigner")()) !== Ethers.getAddress(eligibilitySigner)) {
+    throw new Error("Receipt eligibility signer verification failed");
+  }
+  if ((await governance.getFunction("executionDelay")()) !== executionDelay ||
+      (await governance.getFunction("challengePeriod")()) !== challengePeriod) {
+    throw new Error("Governance timing verification failed");
+  }
+
   const defaultAdminRole = await escrow.getFunction("DEFAULT_ADMIN_ROLE")();
   const guardianRole = await escrow.getFunction("GUARDIAN_ROLE")();
 
@@ -213,6 +241,21 @@ const rpcUrl = rpcUrlByNetwork[networkName];
       nonce: nonce++,
     })
   ).wait();
+
+  const campaignManagerRole = await escrow.getFunction("CAMPAIGN_MANAGER_ROLE")();
+  const treasuryRole = await escrow.getFunction("TREASURY_ROLE")();
+  for (const [role, holder, label] of [
+    [defaultAdminRole, admin, "admin"],
+    [guardianRole, admin, "guardian"],
+    [campaignManagerRole, admin, "campaign manager"],
+    [treasuryRole, admin, "treasury"],
+    [defaultAdminRole, await governance.getAddress(), "governance admin"],
+    [guardianRole, await governance.getAddress(), "governance guardian"],
+  ] as const) {
+    if (!(await escrow.getFunction("hasRole")(role, holder))) {
+      throw new Error(`Escrow ${label} role verification failed`);
+    }
+  }
 
   await (
     await grantRole(guardianRole, await governance.getAddress(), {
